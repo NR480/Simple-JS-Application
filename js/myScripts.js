@@ -1,36 +1,50 @@
 var dogRepository = (function() {
     var newdogRepository = [
-        { breed: "Basenji", name: "Baxter", age: "6 months" },
-        { breed: "Doberman", name: "Pokemon", age: "1 yr" },
-        { breed: "Maltese", name: "Lucy", age: "4 yrs" },
-        { breed: "German Shepherd", name: "Cesar", age: "5 yrs" },
-        { breed: "Spaniel", name: "Candy", age: "3 yrs" },
-        { breed: "Akita", name: "Lucky", age: "11 months" }
+
     ];
+    fetch('https://dog.ceo/api/breeds/list/all').then(function(response) {
+        return response.json(); // This returns a promise!
+    }).then(function(dogList) {
+        for (var breed in dogList.message) {
+
+            dogRepository.add(breed)
+            dogRepository.addListItem(breed)
+        }
+    }).catch(function() {
+        // Error
+    });
     return {
         getAll: function() {
             return newdogRepository;
         },
-        add: function(item) {
-            newdogRepository.push({ name: item.name, age: item.age, breed: item.breed });
+        add: function(breed) {
+            newdogRepository.push({ breed: breed });
         },
-        addListItem: function(dog) {
+        addListItem: function(breed) {
+            console.log(breed);
             var listItem = document.createElement('li');
             var dogButton = document.createElement('button');
 
             // create the button
-            dogButton.innerText = dog.breed;
+            dogButton.innerText = breed;
             dogButton.classList.add('dog-button');
             dogButton.addEventListener('click', function(event) {
-                this.showDetails(dog);
+                this.showDetails(breed);
             }.bind(this));
 
             // create the list item and add it to the DOM
             listItem.append(dogButton);
             dogListElement.append(listItem);
         },
-        showDetails: function(dog) {
-            console.log(dog);
+        showDetails: function(breed) {
+            fetch(`https://dog.ceo/api/breed/${breed}/images/random`).then(function(response) {
+                return response.json(); // This returns a promise!
+            }).then(function(image) {
+                console.log(image); // The actual JSON response
+            }).catch(function() {
+                // Error
+            });
+
         }
     };
 })();
@@ -40,8 +54,4 @@ var dogListElement = document.querySelector('.dog-list');
 
 // get all the dogs for looping over
 var dogs = dogRepository.getAll();
-
-// loop over them
-for (var dog of dogs) {
-    dogRepository.addListItem(dog);
-}
+console.log(dogs.length);
